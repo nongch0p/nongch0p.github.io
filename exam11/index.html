@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <script>
+        $(function () 
+        {
+            $('head').load('head.html')
+            $('#header').load('header.html')
+        })
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10 Local Storage</title>
+</head >
+<body onload="get_data()">
+
+    <div id = "header"></div>
+
+      <script>
+        let sname = []
+        let phone = []
+        let dept = []
+        function submit_click() {
+          sname.push(document.getElementById('sname').value)
+          phone.push(document.getElementById('phone').value)  
+          dept.push(document.getElementById('dept').value)
+          localStorage.setItem('sname', JSON.stringify(sname))
+          localStorage.setItem('phone', JSON.stringify(phone))
+          localStorage.setItem('dept', JSON.stringify(dept)) 
+
+          document.getElementById('sname').value = null
+          document.getElementById('phone').value = null
+          document.getElementById('dept').selectedIndex = 0
+
+        }
+
+        function get_data() {
+          
+            sname = JSON.parse(localStorage.getItem('sname'))
+            phone = JSON.parse(localStorage.getItem('phone'))
+            dept = JSON.parse(localStorage.getItem('dept'))
+
+            if (sname == null) {
+                sname = []
+            }
+
+            if (phone == null) {
+                phone = []
+            }
+
+            if (dept == null) {
+                dept = []
+            }
+
+            console.log(sname)
+        }
+
+
+
+      </script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+</body>
+</html>

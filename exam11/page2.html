@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page2</title>
+
+    <script>
+        $(function () 
+        {
+            $('head').load('head.html')
+            $('#header').load('header.html')
+        })
+    </script>
+</head>
+<body onload = "click_load_data()">
+    <div id = "header"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+
+    <div class="col-5 mt-5 mx-auto bg-light p-3 border">
+        <button type = "button" class = "btn btn-success mb-3 mx-auto text-center" 
+                       id = "add_new_data" onclick = "click_add_newdata()">Add new data</button>
+        <table class="table border border-danger  border-3 table-hover table-striped" id = "tb1" >
+            <thead>
+              <tr>
+                <th scope="col">STD</th>
+                <th scope="col">Sname</th>
+                <th scope="col">Phone</th>
+              </tr>
+            </thead>
+            <tbody>
+                <!-- hee -->
+            </tbody>
+          </table>
+    </div> 
+    <script> 
+        let tb1 = document.getElementById('tb1').getElementsByTagName('tbody')[0]
+        let row 
+        let sid   = []
+        let sname = []
+        let phone = []
+
+        if(sessionStorage.getItem('user') == null)
+        {
+            alert('กรุณาล็อคอินให้เรียบร้อย')
+            location.href ='login.html'
+        }
+
+        function click_add_newdata() 
+        {
+            row = tb1.insertRow();
+            row.insertCell().innerHTML = '<input type="text" class="form-control" id="sid" placeholder="Input STD"></input>';
+            row.insertCell().innerHTML = '<input type="text" class="form-control" id="sname" placeholder="Input Full name"></input>';
+            row.insertCell().innerHTML = '<input type="text" class="form-control" id="phone" placeholder="Input Phone"></input>';
+            row.insertCell().innerHTML = '<button type="button" class="btn btn-success mb-3" id="save_edit_row' + tb1.rows.length + '" onclick="click_save_data()">SAVE</button>';
+            row.insertCell().innerHTML = '<button type="button" class="btn btn-danger mb-3" id="cancel_edit_row' + tb1.rows.length + '" onclick="click_cancel()">CANCEL</button>';
+
+            document.getElementById('add_new_data').disabled = true;
+
+            // ปิดใช้งานปุ่ม Edit และ Delete ของแถวอื่น
+            for (let j = 0; j < tb1.rows.length - 1; j++) {
+                tb1.rows[j].cells[3].querySelector('button').disabled = true;
+                tb1.rows[j].cells[4].querySelector('button').disabled = true;
+            }
+        }
+
+        
+        function click_save_data()
+        {
+            sid.push(document.getElementById('sid').value)
+            sname.push(document.getElementById('sname').value)
+            phone.push(document.getElementById('phone').value)
+            
+            localStorage.setItem('sid', JSON.stringify(sid))
+            localStorage.setItem('sname', JSON.stringify(sname))
+            localStorage.setItem('phone', JSON.stringify(phone))
+
+            click_load_data();
+            document.getElementById('add_new_data').disabled = false
+        }
+
+        function click_load_data()
+        {
+            try 
+            {
+                sid     = JSON.parse(localStorage.getItem('sid'))
+                sname   = JSON.parse(localStorage.getItem('sname'))
+                phone   = JSON.parse(localStorage.getItem('phone'))
+                tb1.innerHTML = ''
+                for (let i = 0 ; i < sid.length; i ++)
+                {
+                    row = tb1.insertRow()
+                    row.insertCell().innerHTML = sid[i]
+                    row.insertCell().innerHTML = sname[i]
+                    row.insertCell().innerHTML = phone[i]
+                    row.insertCell().innerHTML = '<button type="button" class="btn btn-primary mb-3" onclick="click_edit_data(' + i + ')">Edit</button>'
+                    row.insertCell().innerHTML = '<button type="button" class="btn btn-danger mb-3" onclick="click_delete_data(' + i + ')">Delete</button>'
+                }
+            }
+            catch(error)
+            {
+                if (sid == null)
+                {
+                    sid   = []
+                    sname = []
+                    phone = []
+                    localStorage.setItem('sid',   JSON.stringify(sid))
+                    localStorage.setItem('sname', JSON.stringify(sname))
+                    localStorage.setItem('phone', JSON.stringify(phone))
+                }
+            }
+        }
+
+        function click_cancel() 
+        {
+            tb1.deleteRow(tb1.rows.length - 1);
+            document.getElementById('add_new_data').disabled = false;
+
+            // เปิดใช้งานปุ่ม Edit และ Delete ของแถวอื่น
+            for (let j = 0; j < tb1.rows.length - 1; j++) {
+                tb1.rows[j].cells[3].querySelector('button').disabled = false;
+                tb1.rows[j].cells[4].querySelector('button').disabled = false;
+            }
+        }
+
+
+        function click_delete_data(i)
+        {
+            if(confirm('ต้องการลบใช่หรือไม่ ????'))
+            {
+                sid.splice(i,1)
+                sname.splice(i,1)
+                phone.splice(i,1)
+
+                localStorage.setItem('sid', JSON.stringify(sid))
+                localStorage.setItem('sname', JSON.stringify(sname))
+                localStorage.setItem('phone', JSON.stringify(phone))
+                
+                click_load_data()
+            }
+        }
+
+        function click_edit_data(i) {
+            // กด edit แล้ว ปุ่ม addnew จะใช้ไม่ได้
+            document.getElementById('add_new_data').disabled = true
+            for (let j = 0; j < tb1.rows.length; j++) {
+                if (j !== i) {
+                    tb1.rows[j].cells[3].querySelector('button').disabled = true;
+                    tb1.rows[j].cells[4].querySelector('button').disabled = true;
+                }
+            }
+            
+            tb1.rows[i].cells[0].innerHTML = '<input type="text" class="form-control" id="edit_sid" value="' + sid[i] + '"></input>';
+            tb1.rows[i].cells[1].innerHTML = '<input type="text" class="form-control" id="edit_sname" value="' + sname[i] + '"></input>';
+            tb1.rows[i].cells[2].innerHTML = '<input type="text" class="form-control" id="edit_phone" value="' + phone[i] + '"></input>';
+            tb1.rows[i].cells[3].innerHTML = '<button type="button" class="btn btn-success mb-3" id = "save_edit"   onclick="click_save_edit(' + i + ')">SAVE</button>';
+            tb1.rows[i].cells[4].innerHTML = '<button type="button" class="btn btn-danger mb-3"  id = "cancle_edit" onclick="click_cancel_edit()">CANCEL</button>';
+        }
+
+        function click_save_edit(i) {
+            //กด cancel แล้วปุ่ม addnew จะกลับมา
+            document.getElementById('add_new_data').disabled = false
+            sid[i] = document.getElementById('edit_sid').value;
+            sname[i] = document.getElementById('edit_sname').value;
+            phone[i] = document.getElementById('edit_phone').value;
+
+            localStorage.setItem('sid', JSON.stringify(sid));
+            localStorage.setItem('sname', JSON.stringify(sname));
+            localStorage.setItem('phone', JSON.stringify(phone));
+
+            click_load_data();
+        }
+
+        function click_cancel_edit() {
+            click_load_data();
+            document.getElementById('add_new_data').disabled = false
+        }
+    </script>
+</body>
+</html>
